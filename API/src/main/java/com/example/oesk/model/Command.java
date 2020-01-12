@@ -42,6 +42,14 @@ public class Command extends DateAudit {
     )
     private Set<Result> results = new HashSet<>();
 
+    @OneToMany(
+        fetch = FetchType.LAZY, 
+        mappedBy = "command",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private Set<Recurrent> recurrents = new HashSet<>();
+
     public Command() {}    
 
     public Command(@NotBlank int n, @NotBlank int c, @NotBlank @Size(max = 40) String url) {
@@ -130,5 +138,13 @@ public class Command extends DateAudit {
 
     public void setResults(Set<Result> results) {
         this.results = results;
+    }
+
+    public Set<Recurrent> getRecurrents() {
+        return recurrents;
+    }
+
+    public void setRecurrents(Set<Recurrent> recurrents) {
+        this.recurrents = recurrents;
     }
 }

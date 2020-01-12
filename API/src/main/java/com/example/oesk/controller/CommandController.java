@@ -1,6 +1,7 @@
 package com.example.oesk.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -8,17 +9,19 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.validation.Valid;
 
 import com.example.oesk.model.Command;
-import com.example.oesk.model.Result;
-import com.example.oesk.model.Status;
+import com.example.oesk.model.Recurrent;
 import com.example.oesk.payload.ApiResponse;
 import com.example.oesk.payload.CommandRequest;
 import com.example.oesk.payload.CommandResponse;
 import com.example.oesk.payload.PagedResponse;
-import com.example.oesk.repository.ResultRepository;
+import com.example.oesk.repository.CommandRepository;
+import com.example.oesk.repository.RecurrentRepository;
 import com.example.oesk.service.CommandService;
 import com.example.oesk.util.AppConstants;
 
 import java.net.URI;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @RestController
@@ -26,7 +29,10 @@ import java.util.List;
 public class CommandController {
 
     @Autowired
-    private ResultRepository resultRepository;
+    private CommandRepository commandRepository;
+
+    @Autowired
+    private RecurrentRepository recurrentRepository;
 
     @Autowired
     private CommandService commandService;
@@ -45,23 +51,17 @@ public class CommandController {
     @PostMapping
     public ResponseEntity<?> createCommand(@Valid @RequestBody CommandRequest commandRequest) {
         Command command = commandService.createCommand(commandRequest);
-
-        // start command executing
-        Runnable runnable = () -> {
-            Result result = resultRepository.save(new Result(command));            
-            try {
-                if (command.execute(result, resultRepository)) {
-                    result.setStatus(Status.DONE.name());
-                } else {
-                    result.setStatus(Status.FAILED.name());
-                }
-            } catch(Exception e) {
-                result.setStatus(Status.FAILED.name());
+        
+        if (commandRequest.getRepetitions() == 0 && commandRequest.getFrequency() == 0) {
+            // start command executing
+            commandService.startExecutingCommand(command);
+        } else {
+            if (commandRequest.getStart() == null) {
+                commandRequest.setStart(Instant.now().truncatedTo(ChronoUnit.MINUTES));
             }
-            resultRepository.save(result);
-        };
-        Thread thread = new Thread(runnable);
-        thread.start();
+            Recurrent recurrent = new Recurrent(commandRequest.getFrequency(), commandRequest.getRepetitions(), commandRequest.getStart(), command);
+            recurrentRepository.save(recurrent);
+        }
         
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{commandId}")
@@ -84,5 +84,15 @@ public class CommandController {
     @GetMapping("/byParams")
     public CommandResponse getCommandByParameters(@RequestParam(value = "url") String url, @RequestParam(value = "n") int n, @RequestParam(value = "c") int c) {
         return commandService.getCommandByParameters(url, n, c);
+    }
+
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<?> deleteRecurrent(@PathVariable Long id) {
+        try {
+            commandRepository.deleteById(id);
+        } catch( Exception e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

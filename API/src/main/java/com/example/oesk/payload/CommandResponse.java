@@ -9,6 +9,7 @@ public class CommandResponse {
     private int c;
     private String url;
     private Set<ResultResponse> results;
+    private Set<RecurrentResponse> recurrents;
     private Instant creationDateTime;
 
     public Long getId() {
@@ -57,5 +58,13 @@ public class CommandResponse {
 
     public void setResults(Set<ResultResponse> results) {
         this.results = results;
+    }
+
+    public Set<RecurrentResponse> getRecurrents() {
+        return recurrents;
+    }
+
+    public void setRecurrents(Set<RecurrentResponse> recurrents) {
+        this.recurrents = recurrents;
     }
 }
