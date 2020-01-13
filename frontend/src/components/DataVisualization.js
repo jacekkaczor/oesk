@@ -89,9 +89,8 @@ class DataVisualization extends Component {
     urls.forEach((url, i) => {
       if (url.n === parseInt(selectedN)) {
         url.results.map((v, i) => {
-          url.results[i].creationDateTime = this.convertData(
-            v.creationDateTime
-          );
+          let date = new Date(v.creationDateTime);
+          url.results[i].creationDateTime = date.toLocaleString();
         });
         result = url.results[0];
         result = url.results.reduce(function(a, b) {
@@ -118,7 +117,7 @@ class DataVisualization extends Component {
           return a.c - b.c;
         });
         url.results.sort(function(a, b) {
-          return a.creationDateTime - b.creationDateTime;
+          return a.creationDateTime < b.creationDateTime;
         });
         if (url.c === parseInt(selectedC)) this.setState({ dataNC: url });
       }
@@ -130,14 +129,6 @@ class DataVisualization extends Component {
     var measurements = this.state.measurements;
     measurements[`${k}`] = e.target.checked;
     this.setState({ measurements });
-  };
-
-  convertData = data => {
-    if (data.split("T")[1] === undefined) return data;
-    var temp = data.split("T")[0].split("-");
-    var date = temp[2] + "." + temp[1] + "." + temp[0];
-    var time = data.split("T")[1].split("Z")[0];
-    return date + " " + time;
   };
 
   render() {
