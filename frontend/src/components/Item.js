@@ -17,7 +17,7 @@ class Item extends Component {
     var data = [];
     urls.map(url =>
       url.results.map(result => {
-        const date = this.convertData(result.creationDateTime);
+        const date = new Date(result.creationDateTime);
         var temp = {
           n: url.n,
           c: url.c,
@@ -27,21 +27,13 @@ class Item extends Component {
           median: result.median,
           max: result.max,
           status: result.status,
-          date: date[0],
-          time: date[1]
+          date: date.toLocaleDateString(),
+          time: date.toLocaleTimeString()
         };
         data.push(temp);
       })
     );
     return data;
-  };
-
-  convertData = data => {
-    if (data.split("T")[1] === undefined) return data.split(" ");
-    var temp = data.split("T")[0].split("-");
-    var date = temp[2] + "." + temp[1] + "." + temp[0];
-    var time = data.split("T")[1].split("Z")[0];
-    return [date, time];
   };
 
   render() {
