@@ -60,6 +60,7 @@ class ItemsList extends Component {
             dataSort
             dataField="url"
             filter={{ type: "TextFilter", delay: 100 }}
+            headerAlign="center"
           >
             URL
           </TableHeaderColumn>

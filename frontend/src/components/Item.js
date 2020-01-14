@@ -1,21 +1,23 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import { Redirect, Link } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 import { BootstrapTable, TableHeaderColumn } from "react-bootstrap-table";
 import "../../node_modules/react-bootstrap-table/dist/react-bootstrap-table-all.min.css";
-
 import { deleteItem } from "../actions/urls";
-
 import "./styles.css";
-import DataVisualization from "./DataVisualization";
 import Repatitions from "./Repatitions";
+import { GoGraph } from "react-icons/go";
 
 const selectRowProp = {
   mode: "checkbox"
 };
 
 class Item extends Component {
+  state = {
+    redirect: false
+  };
+
   static propTypes = {
     urls: PropTypes.array
   };
@@ -68,9 +70,15 @@ class Item extends Component {
     }
   };
 
+  showGraphs = () => {
+    this.setState({ redirect: true });
+  };
+
   render() {
     const { urls } = this.props;
+    const { redirect } = this.state;
     if (urls.length === 0) return <Redirect to="/" />;
+    if (redirect) return <Redirect to="/graph" />;
     const title = urls[Object.keys(urls)[0]].url;
     const data = this.prepareData();
     const options = {
@@ -78,6 +86,17 @@ class Item extends Component {
     };
     return (
       <div>
+        <div className="d-flex justify-content-end">
+          <button
+            type="button"
+            className="btn btn-success"
+            onClick={this.showGraphs}
+          >
+            <GoGraph /> Data Visualization
+          </button>
+        </div>
+
+        <h4 className="text-center font-italic mt-3"> {title} </h4>
         <BootstrapTable
           exportCSV
           data={data[0]}
@@ -89,11 +108,7 @@ class Item extends Component {
           options={options}
           id="0"
         >
-          <TableHeaderColumn row="0" colSpan="10" headerAlign="center">
-            {title}
-          </TableHeaderColumn>
           <TableHeaderColumn
-            row="1"
             isKey
             dataField="id"
             headerAlign="center"
@@ -105,7 +120,6 @@ class Item extends Component {
             id
           </TableHeaderColumn>
           <TableHeaderColumn
-            row="1"
             dataField="n"
             headerAlign="center"
             dataAlign="center"
@@ -115,7 +129,6 @@ class Item extends Component {
             n
           </TableHeaderColumn>
           <TableHeaderColumn
-            row="1"
             dataField="c"
             headerAlign="center"
             dataAlign="center"
@@ -125,7 +138,6 @@ class Item extends Component {
             c
           </TableHeaderColumn>
           <TableHeaderColumn
-            row="1"
             dataField="min"
             headerAlign="center"
             dataAlign="center"
@@ -135,7 +147,6 @@ class Item extends Component {
             min
           </TableHeaderColumn>
           <TableHeaderColumn
-            row="1"
             dataField="mean"
             headerAlign="center"
             dataAlign="center"
@@ -145,7 +156,6 @@ class Item extends Component {
             mean
           </TableHeaderColumn>
           <TableHeaderColumn
-            row="1"
             dataField="sd"
             headerAlign="center"
             dataAlign="center"
@@ -155,7 +165,6 @@ class Item extends Component {
             sd
           </TableHeaderColumn>
           <TableHeaderColumn
-            row="1"
             dataField="median"
             headerAlign="center"
             dataAlign="center"
@@ -165,7 +174,6 @@ class Item extends Component {
             median
           </TableHeaderColumn>
           <TableHeaderColumn
-            row="1"
             dataField="max"
             headerAlign="center"
             dataAlign="center"
@@ -175,7 +183,6 @@ class Item extends Component {
             max
           </TableHeaderColumn>
           <TableHeaderColumn
-            row="1"
             dataField="status"
             headerAlign="center"
             dataAlign="center"
@@ -185,7 +192,6 @@ class Item extends Component {
             status
           </TableHeaderColumn>
           <TableHeaderColumn
-            row="1"
             dataField="date"
             headerAlign="center"
             dataAlign="center"
@@ -196,7 +202,6 @@ class Item extends Component {
             date
           </TableHeaderColumn>
           <TableHeaderColumn
-            row="1"
             dataField="time"
             headerAlign="center"
             dataAlign="center"
@@ -208,9 +213,6 @@ class Item extends Component {
         </BootstrapTable>
 
         {data[1].length > 0 ? <Repatitions data={data[1]} /> : null}
-        <Link to="/graph" className="nav-link">
-          Show graphs
-        </Link>
       </div>
     );
   }

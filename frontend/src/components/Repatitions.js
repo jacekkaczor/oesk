@@ -1,12 +1,9 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import { Redirect, Link } from "react-router-dom";
 import { BootstrapTable, TableHeaderColumn } from "react-bootstrap-table";
 import "../../node_modules/react-bootstrap-table/dist/react-bootstrap-table-all.min.css";
-
 import { deleteItem } from "../actions/urls";
-
 import "./styles.css";
 
 const selectRowProp = {

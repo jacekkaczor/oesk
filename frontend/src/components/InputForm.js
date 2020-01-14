@@ -101,8 +101,6 @@ class InputForm extends Component {
       data["repetitions"] = repetitions;
       if (!startNow) data["start"] = start;
     }
-    console.log("rep", data, JSON.stringify(data));
-
     this.props.addRequest(JSON.stringify(data));
   };
 
@@ -202,18 +200,6 @@ class InputForm extends Component {
 
           {reccuring ? (
             <div>
-              <div className="form-check">
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  value={startNow}
-                  onChange={e => this.setStartNow(e)}
-                  checked={startNow}
-                />
-                <label className="form-check-label" htmlFor="exampleCheck1">
-                  Start now
-                </label>
-              </div>
               <div className="form-row align-items-center mt-2 mb-2">
                 <div className="col-sm ">
                   <div className="input-group mb-2">
@@ -249,43 +235,56 @@ class InputForm extends Component {
                     />
                   </div>
                 </div>
+              </div>
 
-                {startNow ? null : (
-                  <div className="form-row align-items-center">
-                    <div className="col-sm ">
-                      <div className="input-group mb-2">
-                        <div className="input-group-prepend">
-                          <div className="input-group-text">
-                            <GoCalendar />
-                          </div>
+              {startNow ? null : (
+                <div className="form-row align-items-center">
+                  <div className="col-sm ">
+                    <div className="input-group mb-2">
+                      <div className="input-group-prepend">
+                        <div className="input-group-text">
+                          <GoCalendar />
                         </div>
-                        <input
-                          className="form-control"
-                          type="date"
-                          placeholder="Date"
-                          value={date}
-                          onChange={e => this.setDate(e, "date")}
-                        />
                       </div>
-                    </div>
-                    <div className="col-sm ">
-                      <div className="input-group mb-2">
-                        <div className="input-group-prepend">
-                          <div className="input-group-text">
-                            <MdAccessTime />
-                          </div>
-                        </div>
-                        <input
-                          className="form-control"
-                          type="time"
-                          placeholder="Time"
-                          value={time}
-                          onChange={e => this.setDate(e, "time")}
-                        />
-                      </div>
+                      <input
+                        className="form-control"
+                        type="date"
+                        placeholder="Date"
+                        value={date}
+                        onChange={e => this.setDate(e, "date")}
+                      />
                     </div>
                   </div>
-                )}
+                  <div className="col-sm ">
+                    <div className="input-group mb-2">
+                      <div className="input-group-prepend">
+                        <div className="input-group-text">
+                          <MdAccessTime />
+                        </div>
+                      </div>
+                      <input
+                        className="form-control"
+                        type="time"
+                        placeholder="Time"
+                        value={time}
+                        onChange={e => this.setDate(e, "time")}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="form-check mb-3">
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  value={startNow}
+                  onChange={e => this.setStartNow(e)}
+                  checked={startNow}
+                />
+                <label className="form-check-label" htmlFor="exampleCheck1">
+                  Start now
+                </label>
               </div>
             </div>
           ) : (
