@@ -5,6 +5,7 @@ import { Redirect, Link } from "react-router-dom";
 import { BootstrapTable, TableHeaderColumn } from "react-bootstrap-table";
 import "../../node_modules/react-bootstrap-table/dist/react-bootstrap-table-all.min.css";
 
+import "./styles.css";
 import DataVisualization from "./DataVisualization";
 
 class Item extends Component {

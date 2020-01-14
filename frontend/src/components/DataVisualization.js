@@ -51,7 +51,7 @@ class DataVisualization extends Component {
         selectedC: c[0],
         measurements: temp
       },
-      this.prepareData()
+      this.prepareData
     );
   }
 
@@ -67,17 +67,22 @@ class DataVisualization extends Component {
           }
         }
       }
-      this.setState({
-        selectedN: event.target.value,
-        selectedC: c[0],
-        allC: c
-      });
+      this.setState(
+        {
+          selectedN: event.target.value,
+          selectedC: c[0],
+          allC: c
+        },
+        this.prepareData
+      );
     } else {
-      this.setState({
-        selectedC: event.target.value
-      });
+      this.setState(
+        {
+          selectedC: event.target.value
+        },
+        this.prepareData
+      );
     }
-    this.prepareData();
   };
 
   prepareData = () => {
@@ -116,9 +121,11 @@ class DataVisualization extends Component {
         newData.sort(function(a, b) {
           return a.c - b.c;
         });
-        url.results.sort(function(a, b) {
+        var newUrl = [];
+        newUrl = url.results.sort(function(a, b) {
           return a.creationDateTime < b.creationDateTime;
         });
+        url.results = newUrl;
         if (url.c === parseInt(selectedC)) this.setState({ dataNC: url });
       }
     });
@@ -191,14 +198,16 @@ class DataVisualization extends Component {
         <label id="urlHelp" className="form-text text-center">
           Graph for the given n and c versus time.
         </label>
-        <BarChart width={600} height={300} data={dataNC.results}>
+        <BarChart width={900} height={300} data={dataNC.results}>
           <XAxis
             dataKey="creationDateTime"
             stroke="#000"
-            tick={{ angle: 90 }}
+            tick={{ angle: 0, width: 50 }}
+            interval={0}
+            scaleToFit={true}
           />
           <YAxis
-            label={{ value: "time", angle: -90, position: "insideLeft" }}
+            label={{ value: "time [ms]", angle: -90, position: "insideLeft" }}
           />
           <Tooltip />
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
@@ -217,9 +226,11 @@ class DataVisualization extends Component {
         <label id="urlHelp" className="form-text text-center">
           Graph for the given n versus c.
         </label>
-        <BarChart width={600} height={300} data={dataN}>
+        <BarChart width={900} height={300} data={dataN}>
           <XAxis dataKey="c" stroke="#000" />
-          <YAxis />
+          <YAxis
+            label={{ value: "time [ms]", angle: -90, position: "insideLeft" }}
+          />
           <Tooltip />
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
           {Object.entries(measurements).map(([key, value], i) =>
@@ -229,6 +240,7 @@ class DataVisualization extends Component {
                 dataKey={`results.${key}`}
                 fill={colors[i]}
                 barSize={30}
+                interval={0}
               />
             ) : null
           )}

@@ -6,6 +6,8 @@ import PropTypes from "prop-types";
 import { BootstrapTable, TableHeaderColumn } from "react-bootstrap-table";
 import "../../node_modules/react-bootstrap-table/dist/react-bootstrap-table-all.min.css";
 
+import "./styles.css";
+
 class ItemsList extends Component {
   state = {
     redirect: false,
@@ -43,11 +45,9 @@ class ItemsList extends Component {
   };
 
   render() {
-    const { urls } = this.props;
     const { redirect, url } = this.state;
     if (redirect) return <Redirect to={`${url}`} />;
     const data = this.prepareData();
-    console.log("ursl", data);
     //if (redirect) return <Redirect to="/graph" />;
     const options = {
       onRowClick: row => this.selectUrl(row.url)
@@ -55,7 +55,12 @@ class ItemsList extends Component {
     return (
       <div>
         <BootstrapTable data={data} striped hover pagination options={options}>
-          <TableHeaderColumn isKey={true} dataSort dataField="url">
+          <TableHeaderColumn
+            isKey={true}
+            dataSort
+            dataField="url"
+            filter={{ type: "TextFilter", delay: 100 }}
+          >
             URL
           </TableHeaderColumn>
         </BootstrapTable>
