@@ -113,7 +113,8 @@ class DataVisualization extends Component {
       if (url.n === parseInt(selectedN) && url.results.length !== 0) {
         url.results.map((v, i) => {
           let date = new Date(v.creationDateTime);
-          url.results[i].creationDateTime = date.toLocaleString();
+          if (date instanceof Date && !isNaN(date))
+            url.results[i].creationDateTime = date.toLocaleString();
         });
         result = url.results[0];
         result = url.results.reduce(function(a, b) {
@@ -139,11 +140,9 @@ class DataVisualization extends Component {
         newData.sort(function(a, b) {
           return a.c - b.c;
         });
-        var newUrl = [];
-        newUrl = url.results.sort(function(a, b) {
-          return a.creationDateTime < b.creationDateTime;
+        url.results.sort(function(a, b) {
+          return a.creationDateTime > b.creationDateTime ? 1 : -1;
         });
-        url.results = newUrl;
         if (url.c === parseInt(selectedC)) this.setState({ dataNC: url });
       }
     });

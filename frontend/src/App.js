@@ -26,7 +26,7 @@ class App extends Component {
           <Alert />
           <Fragment>
             <div className="d-flex justify-content-center p-3">
-              <div className="w-50">
+              <div style={{width: 1000}}>
                 <Switch>
                   <Route exact path="/" component={ItemsList} />
                   <Route exact path="/add" component={InputForm} />

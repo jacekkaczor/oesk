@@ -10,7 +10,8 @@ import Repatitions from "./Repatitions";
 import { GoGraph } from "react-icons/go";
 
 const selectRowProp = {
-  mode: "checkbox"
+  mode: "checkbox",
+  columnWidth: '40px'
 };
 
 class Item extends Component {

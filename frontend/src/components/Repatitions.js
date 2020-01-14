@@ -7,7 +7,8 @@ import { deleteItem } from "../actions/urls";
 import "./styles.css";
 
 const selectRowProp = {
-  mode: "checkbox"
+  mode: "checkbox",
+  columnWidth: '40px'
 };
 
 class Repatitions extends Component {
