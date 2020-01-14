@@ -95,7 +95,7 @@ public class CommandService {
     }
 
     public List<CommandResponse> getCommandsByUrl(String url) {
-        List<Command> commands = commandRepository.findByUrlContaining(url);
+        List<Command> commands = commandRepository.findByUrl(url);
 
         List<CommandResponse> commandResponses = commands.stream().map(command -> {
             return ModelMapper.mapCommandToCommandResponse(command);

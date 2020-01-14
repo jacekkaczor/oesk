@@ -16,7 +16,7 @@ public interface CommandRepository extends JpaRepository<Command, Long> {
 
     Optional<Command> findByUrlAndNAndC(String url, int n, int c);
 
-    List<Command> findByUrlContaining(String url);
+    List<Command> findByUrl(String url);
 
     @Query(value = "select c.url from Command c group by c.url")
     List<String> findAllUrls();
