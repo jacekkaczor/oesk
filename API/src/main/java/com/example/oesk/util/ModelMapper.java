@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import com.example.oesk.model.Command;
 import com.example.oesk.payload.CommandResponse;
+import com.example.oesk.payload.RecurrentResponse;
 import com.example.oesk.payload.ResultResponse;
 
 public class ModelMapper {
@@ -30,7 +31,17 @@ public class ModelMapper {
             return resultResponse;
         }).collect(Collectors.toSet());
 
+        Set<RecurrentResponse> recurrentResponses = command.getRecurrents().stream().map(recurrent -> {
+            RecurrentResponse recurrentResponse = new RecurrentResponse();
+            recurrentResponse.setId(recurrent.getId());
+            recurrentResponse.setFrequency(recurrent.getFrequency());
+            recurrentResponse.setRepetitions(recurrent.getRepetitions());
+            recurrentResponse.setStart(recurrent.getStart());
+            return recurrentResponse;
+        }).collect(Collectors.toSet());
+
         commandResponse.setResults(resultResponses);
+        commandResponse.setRecurrents(recurrentResponses);
 
         return commandResponse;
     }

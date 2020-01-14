@@ -11,7 +11,7 @@ import org.springframework.data.domain.Sort;
 
 @Repository
 public interface ResultRepository extends JpaRepository<Result, Long> {
-    Optional<Result> findById(Long commandId);
+    Optional<Result> findById(Long resultId);
 
     List<Result> findByIdIn(List<Long> resultId);
 

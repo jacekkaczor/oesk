@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -14,10 +15,13 @@ import java.util.stream.Collectors;
 import com.example.oesk.exception.BadRequestException;
 import com.example.oesk.exception.ResourceNotFoundException;
 import com.example.oesk.model.Command;
+import com.example.oesk.model.Result;
+import com.example.oesk.model.Status;
 import com.example.oesk.payload.CommandRequest;
 import com.example.oesk.payload.CommandResponse;
 import com.example.oesk.payload.PagedResponse;
 import com.example.oesk.repository.CommandRepository;
+import com.example.oesk.repository.ResultRepository;
 import com.example.oesk.util.AppConstants;
 import com.example.oesk.util.ModelMapper;
 
@@ -25,6 +29,27 @@ import com.example.oesk.util.ModelMapper;
 public class CommandService {
     @Autowired
     private CommandRepository commandRepository;
+
+    @Autowired
+    private ResultRepository resultRepository;
+
+    public void startExecutingCommand(Command command) {
+        Runnable runnable = () -> {
+            Result result = resultRepository.save(new Result(command));            
+            try {
+                if (command.execute(result, resultRepository)) {
+                    result.setStatus(Status.DONE.name());
+                } else {
+                    result.setStatus(Status.FAILED.name());
+                }
+            } catch(Exception e) {
+                result.setStatus(Status.FAILED.name());
+            }
+            resultRepository.save(result);
+        };
+        Thread thread = new Thread(runnable);
+        thread.start();
+    }
 
     public PagedResponse<CommandResponse> getAllCommands(int page, int size) {
         validatePageNumberAndSize(page, size);
