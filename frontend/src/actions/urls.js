@@ -4,6 +4,7 @@ import { createMessage, returnErrors } from "./messages";
 export const GET_URLS = "GET_URLS";
 export const GET_BY_URL = "GET_BY_URL";
 export const ADD_REQUEST = "ADD_REQUEST";
+export const DELETE_ITEM = "DELETE_ITEM";
 
 export const getUrls = () => dispatch => {
   axios
@@ -49,6 +50,7 @@ export const getByUrl = url => dispatch => {
 };
 
 export const addRequest = request => dispatch => {
+  console.log("add request", request);
   axios
     .post("http://localhost:5000/api/commands", request, {
       headers: {
@@ -60,6 +62,25 @@ export const addRequest = request => dispatch => {
       dispatch(createMessage({ addRequest: "Request Added" }));
       dispatch({
         type: ADD_REQUEST
+      });
+    })
+    .catch(err =>
+      dispatch(returnErrors(err.response.data, err.response.status))
+    );
+};
+
+export const deleteItem = (table, id) => dispatch => {
+  axios
+    .delete(`http://localhost:5000/api/${table}/${id}`, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      }
+    })
+    .then(res => {
+      dispatch(createMessage({ deleteItem: "Item Deleted" }));
+      dispatch({
+        type: DELETE_ITEM
       });
     })
     .catch(err =>

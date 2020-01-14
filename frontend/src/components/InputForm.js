@@ -1,5 +1,6 @@
 import { GiSandsOfTime } from "react-icons/gi";
-import { MdRepeatOne } from "react-icons/md";
+import { MdRepeatOne, MdAccessTime } from "react-icons/md";
+import { GoCalendar } from "react-icons/go";
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { addRequest } from "../actions/urls";
@@ -10,12 +11,33 @@ class InputForm extends Component {
     url: "",
     n: 1,
     c: 1,
-    reccuring: false
+    reccuring: false,
+    date: "2020-01-15",
+    time: "10:00",
+    frequency: 1,
+    repetitions: 1,
+    startNow: false
   };
 
   static propTypes = {
     addRequest: PropTypes.func.isRequired
   };
+
+  componentDidMount() {
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, "0");
+    var mm = String(today.getMonth() + 1).padStart(2, "0");
+    var yyyy = today.getFullYear();
+    var hh = String(today.getHours() + 1);
+
+    var date = yyyy + "-" + mm + "-" + dd;
+    var time = hh + ":00";
+
+    this.setState({
+      date,
+      time
+    });
+  }
 
   handleRecurringChange = e => {
     let reccuring = e.target.value === "recurring" ? true : false;
@@ -33,18 +55,69 @@ class InputForm extends Component {
     else if (type === "c") this.setState({ c: e.target.value });
   };
 
+  setStartNow = e => {
+    this.setState({ startNow: e.target.checked });
+  };
+
+  setDate = (e, type) => {
+    if (type === "date") {
+      this.setState({ date: e.target.value });
+    } else if (type === "time") {
+      this.setState({ time: e.target.value });
+    }
+    console.log("date", this.state.date, this.state.time);
+  };
+
+  setFrequency = e => {
+    this.setState({ frequency: e.target.value });
+  };
+
+  setRepetitions = e => {
+    this.setState({ repetitions: e.target.value });
+  };
+
   onSubmit = () => {
-    const { url, n, c } = this.state;
-    let data = JSON.stringify({
+    const {
+      url,
+      n,
+      c,
+      reccuring,
+      date,
+      time,
+      frequency,
+      repetitions,
+      startNow
+    } = this.state;
+    const start = new Date(date + " " + time).toJSON();
+
+    var data = {
       url: url,
       n: n,
       c: c
-    });
-    this.props.addRequest(data);
+    };
+
+    if (reccuring) {
+      data["frequency"] = frequency;
+      data["repetitions"] = repetitions;
+      if (!startNow) data["start"] = start;
+    }
+    console.log("rep", data, JSON.stringify(data));
+
+    this.props.addRequest(JSON.stringify(data));
   };
 
   render() {
-    const { url, n, c } = this.state;
+    const {
+      url,
+      n,
+      c,
+      reccuring,
+      startNow,
+      date,
+      time,
+      frequency,
+      repetitions
+    } = this.state;
     return (
       <div className="card card-body mt-4 mb-4">
         <h4 className="card-title pb-2">New query</h4>
@@ -52,7 +125,6 @@ class InputForm extends Component {
           <div className="form-group">
             <label>URL address</label>
             <input
-              type="url"
               className="form-control"
               id="inputUrl"
               value={url}
@@ -105,7 +177,7 @@ class InputForm extends Component {
                 name="radios"
                 id="nonRecurringRadio"
                 value="nonRecurring"
-                checked={this.state.reccuring === false}
+                checked={reccuring === false}
                 onChange={this.handleRecurringChange}
               />
               <label className="form-check-label" htmlFor="nonRecurringRadio">
@@ -119,7 +191,7 @@ class InputForm extends Component {
                 name="radios"
                 id="recurringRadio"
                 value="recurring"
-                checked={this.state.reccuring === true}
+                checked={reccuring === true}
                 onChange={this.handleRecurringChange}
               />
               <label className="form-check-label" htmlFor="recurringRadio">
@@ -128,37 +200,92 @@ class InputForm extends Component {
             </div>
           </div>
 
-          {this.state.reccuring ? (
-            <div className="form-row align-items-center mt-2 mb-2">
-              <div className="col-auto w-50">
-                <div className="input-group mb-2">
-                  <div className="input-group-prepend">
-                    <div className="input-group-text">
-                      <GiSandsOfTime />
-                    </div>
-                  </div>
-                  <input
-                    type="number"
-                    className="form-control"
-                    placeholder="Frequency"
-                    min="2"
-                  />
-                </div>
+          {reccuring ? (
+            <div>
+              <div className="form-check">
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  value={startNow}
+                  onChange={e => this.setStartNow(e)}
+                  checked={startNow}
+                />
+                <label className="form-check-label" htmlFor="exampleCheck1">
+                  Start now
+                </label>
               </div>
-              <div className="col-auto w-50">
-                <div className="input-group mb-2">
-                  <div className="input-group-prepend">
-                    <div className="input-group-text">
-                      <MdRepeatOne />
+              <div className="form-row align-items-center mt-2 mb-2">
+                <div className="col-sm ">
+                  <div className="input-group mb-2">
+                    <div className="input-group-prepend">
+                      <div className="input-group-text">
+                        <GiSandsOfTime />
+                      </div>
+                    </div>
+                    <input
+                      type="number"
+                      className="form-control"
+                      placeholder="Frequency"
+                      min="1"
+                      value={frequency}
+                      onChange={e => this.setFrequency(e)}
+                    />
+                  </div>
+                </div>
+                <div className="col-sm">
+                  <div className="input-group mb-2">
+                    <div className="input-group-prepend">
+                      <div className="input-group-text">
+                        <MdRepeatOne />
+                      </div>
+                    </div>
+                    <input
+                      type="number"
+                      className="form-control"
+                      placeholder="Number of repetitions"
+                      min="-1"
+                      value={repetitions}
+                      onChange={e => this.setRepetitions(e)}
+                    />
+                  </div>
+                </div>
+
+                {startNow ? null : (
+                  <div className="form-row align-items-center">
+                    <div className="col-sm ">
+                      <div className="input-group mb-2">
+                        <div className="input-group-prepend">
+                          <div className="input-group-text">
+                            <GoCalendar />
+                          </div>
+                        </div>
+                        <input
+                          className="form-control"
+                          type="date"
+                          placeholder="Date"
+                          value={date}
+                          onChange={e => this.setDate(e, "date")}
+                        />
+                      </div>
+                    </div>
+                    <div className="col-sm ">
+                      <div className="input-group mb-2">
+                        <div className="input-group-prepend">
+                          <div className="input-group-text">
+                            <MdAccessTime />
+                          </div>
+                        </div>
+                        <input
+                          className="form-control"
+                          type="time"
+                          placeholder="Time"
+                          value={time}
+                          onChange={e => this.setDate(e, "time")}
+                        />
+                      </div>
                     </div>
                   </div>
-                  <input
-                    type="number"
-                    className="form-control"
-                    placeholder="Number of repetitions"
-                    min="2"
-                  />
-                </div>
+                )}
               </div>
             </div>
           ) : (
