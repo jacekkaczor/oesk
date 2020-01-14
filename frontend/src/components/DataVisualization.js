@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { Redirect } from "react-router-dom";
 import { BarChart, Bar, CartesianGrid, XAxis, YAxis, Tooltip } from "recharts";
+import { MdKeyboardBackspace } from "react-icons/md";
 
 const measurements = ["min", "mean", "sd", "median", "max"];
 const colors = ["#8884d8", "#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
@@ -15,7 +16,8 @@ class DataVisualization extends Component {
     selectedC: null,
     dataN: [],
     dataNC: [],
-    measurements: []
+    measurements: [],
+    redirect: false
   };
 
   static propTypes = {
@@ -24,6 +26,38 @@ class DataVisualization extends Component {
   };
 
   componentDidMount() {
+    var params = this.getParams();
+    const temp = {};
+    for (const key of measurements) {
+      if (key === "mean") temp[key] = true;
+      else temp[key] = false;
+    }
+
+    this.setState(
+      {
+        allN: params[0],
+        allC: params[1],
+        selectedN: params[0][0],
+        selectedC: params[1][0],
+        measurements: temp
+      },
+      this.prepareData
+    );
+  }
+
+  componentDidUpdate(prevProps) {
+    const { parameters } = this.props;
+    var params = this.getParams();
+
+    if (prevProps.parameters !== parameters) {
+      this.setState({
+        allN: params[0],
+        allC: params[1]
+      });
+    }
+  }
+
+  getParams = () => {
     const { parameters } = this.props;
     var n = [],
       c = [];
@@ -36,24 +70,8 @@ class DataVisualization extends Component {
         }
       }
     }
-
-    const temp = {};
-    for (const key of measurements) {
-      if (key === "mean") temp[key] = true;
-      else temp[key] = false;
-    }
-
-    this.setState(
-      {
-        allN: n,
-        allC: c,
-        selectedN: n[0],
-        selectedC: c[0],
-        measurements: temp
-      },
-      this.prepareData
-    );
-  }
+    return [n, c];
+  };
 
   changeParameter = (event, type) => {
     const { parameters } = this.props;
@@ -92,7 +110,7 @@ class DataVisualization extends Component {
       newData = [];
     var temp = JSON.parse(JSON.stringify(urls));
     urls.forEach((url, i) => {
-      if (url.n === parseInt(selectedN)) {
+      if (url.n === parseInt(selectedN) && url.results.length !== 0) {
         url.results.map((v, i) => {
           let date = new Date(v.creationDateTime);
           url.results[i].creationDateTime = date.toLocaleString();
@@ -138,6 +156,10 @@ class DataVisualization extends Component {
     this.setState({ measurements });
   };
 
+  back = () => {
+    this.setState({ redirect: true });
+  };
+
   render() {
     const {
       allN,
@@ -146,11 +168,14 @@ class DataVisualization extends Component {
       selectedC,
       dataN,
       dataNC,
-      measurements
+      measurements,
+      redirect
     } = this.state;
     const { urls } = this.props;
     if (urls.length === 0) return <Redirect to="/" />;
     if (dataN.length === 0 || dataNC.length === 0) this.prepareData();
+
+    if (redirect) return <Redirect to={`/:${urls[0].url}`} />;
     return (
       <div>
         <div className="form-row align-items-center mt-2">
@@ -263,6 +288,9 @@ class DataVisualization extends Component {
             </div>
           ))}
         </div>
+        <button type="button" className="btn btn-success" onClick={this.back}>
+          <MdKeyboardBackspace /> Back
+        </button>
       </div>
     );
   }

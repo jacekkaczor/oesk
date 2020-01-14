@@ -32,11 +32,15 @@ export const getByUrl = url => dispatch => {
       }
     })
     .then(res => {
+      var newData = [];
+      res.data.map(result => {
+        if (result.results.length !== 0) newData.push(result);
+      });
       dispatch({
         type: GET_BY_URL,
         payload: [
           res.data,
-          res.data.reduce((params, { n, c }) => {
+          newData.reduce((params, { n, c }) => {
             if (!params[n]) params[n] = [];
             params[n].push(c);
             return params;
@@ -50,7 +54,6 @@ export const getByUrl = url => dispatch => {
 };
 
 export const addRequest = request => dispatch => {
-  console.log("add request", request);
   axios
     .post("http://localhost:5000/api/commands", request, {
       headers: {

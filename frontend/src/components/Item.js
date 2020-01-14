@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import { Redirect } from "react-router-dom";
 import { BootstrapTable, TableHeaderColumn } from "react-bootstrap-table";
 import "../../node_modules/react-bootstrap-table/dist/react-bootstrap-table-all.min.css";
-import { deleteItem } from "../actions/urls";
+import { deleteItem, getByUrl } from "../actions/urls";
 import "./styles.css";
 import Repatitions from "./Repatitions";
 import { GoGraph } from "react-icons/go";
@@ -23,7 +23,8 @@ class Item extends Component {
   };
 
   static propTypes = {
-    deleteItem: PropTypes.func.isRequired
+    deleteItem: PropTypes.func.isRequired,
+    getByUrl: PropTypes.func.isRequired
   };
 
   prepareData = () => {
@@ -52,7 +53,7 @@ class Item extends Component {
         const date = new Date(item.start);
         var temp = {
           id: item.id,
-          frequency: item.id,
+          frequency: item.frequency,
           repetitions: item.repetitions,
           date: date.toLocaleDateString(),
           time: date.toLocaleTimeString()
@@ -71,6 +72,8 @@ class Item extends Component {
   };
 
   showGraphs = () => {
+    const { urls } = this.props;
+    this.props.getByUrl(urls[0].url);
     this.setState({ redirect: true });
   };
 
@@ -106,7 +109,6 @@ class Item extends Component {
           deleteRow={true}
           selectRow={selectRowProp}
           options={options}
-          id="0"
         >
           <TableHeaderColumn
             isKey
@@ -224,4 +226,4 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(mapStateToProps, { deleteItem })(Item);
+export default connect(mapStateToProps, { deleteItem, getByUrl })(Item);

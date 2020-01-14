@@ -23,7 +23,6 @@ class Repatitions extends Component {
   };
 
   render() {
-    console.log("hi", this.props.data);
     const options = {
       afterDeleteRow: this.onAfterDeleteRow
     };
