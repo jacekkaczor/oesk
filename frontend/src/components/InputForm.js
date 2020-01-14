@@ -30,7 +30,6 @@ class InputForm extends Component {
     var yyyy = today.getFullYear();
     var hh = String(today.getHours() + 1);
 
-    console.log(hh);
     if (hh.length === 1) hh = "0" + hh;
     var date = yyyy + "-" + mm + "-" + dd;
     var time = hh + ":00";
