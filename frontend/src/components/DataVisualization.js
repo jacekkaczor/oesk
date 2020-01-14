@@ -17,7 +17,8 @@ class DataVisualization extends Component {
     dataN: [],
     dataNC: [],
     measurements: [],
-    redirect: false
+    redirect: false,
+    show: false
   };
 
   static propTypes = {
@@ -26,6 +27,10 @@ class DataVisualization extends Component {
   };
 
   componentDidMount() {
+    const { urls } = this.props;
+    urls.map(url => {
+      if (url.results.length !== 0) this.setState({ show: true });
+    });
     var params = this.getParams();
     const temp = {};
     for (const key of measurements) {
@@ -50,9 +55,12 @@ class DataVisualization extends Component {
     var params = this.getParams();
 
     if (prevProps.parameters !== parameters) {
+      var show = true;
+      if (Object.keys(parameters).length === 0) show = false;
       this.setState({
         allN: params[0],
-        allC: params[1]
+        allC: params[1],
+        show
       });
     }
   }
@@ -168,125 +176,140 @@ class DataVisualization extends Component {
       dataN,
       dataNC,
       measurements,
-      redirect
+      redirect,
+      show
     } = this.state;
     const { urls } = this.props;
     if (urls.length === 0) return <Redirect to="/" />;
-    if (dataN.length === 0 || dataNC.length === 0) this.prepareData();
+    if ((dataN.length === 0 || dataNC.length === 0) && show) this.prepareData();
 
     if (redirect) return <Redirect to={`/:${urls[0].url}`} />;
     return (
       <div>
-        <div className="form-row align-items-center mt-2">
-          <div className="form-group col-md-6">
-            <div className="input-group mb-2">
-              <div className="input-group-prepend">
-                <div className="input-group-text">-n</div>
+        {show ? (
+          <div>
+            <div className="form-row align-items-center mt-2">
+              <div className="form-group col-md-6">
+                <div className="input-group mb-2">
+                  <div className="input-group-prepend">
+                    <div className="input-group-text">-n</div>
+                  </div>
+                  <select
+                    id="inputState"
+                    className="form-control"
+                    onChange={e => this.changeParameter(e, "n")}
+                    value={selectedN || ""}
+                  >
+                    {allN.map((n, i) => (
+                      <option key={i} value={n}>
+                        {n}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
-              <select
-                id="inputState"
-                className="form-control"
-                onChange={e => this.changeParameter(e, "n")}
-                value={selectedN || ""}
-              >
-                {allN.map((n, i) => (
-                  <option key={i} value={n}>
-                    {n}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
 
-          <div className="form-group col-md-6">
-            <div className="input-group mb-2">
-              <div className="input-group-prepend">
-                <div className="input-group-text">-c</div>
+              <div className="form-group col-md-6">
+                <div className="input-group mb-2">
+                  <div className="input-group-prepend">
+                    <div className="input-group-text">-c</div>
+                  </div>
+                  <select
+                    id="inputState"
+                    className="form-control"
+                    onChange={e => this.changeParameter(e, "c")}
+                    value={selectedC || ""}
+                  >
+                    {allC.map((c, i) => (
+                      <option key={i} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
-              <select
-                id="inputState"
-                className="form-control"
-                onChange={e => this.changeParameter(e, "c")}
-                value={selectedC || ""}
-              >
-                {allC.map((c, i) => (
-                  <option key={i} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
             </div>
-          </div>
-        </div>
 
-        <label id="urlHelp" className="form-text text-center">
-          Graph for the given n and c versus time.
-        </label>
-        <BarChart width={900} height={300} data={dataNC.results}>
-          <XAxis
-            dataKey="creationDateTime"
-            stroke="#000"
-            tick={{ angle: 0, width: 50 }}
-            interval={0}
-            scaleToFit={true}
-          />
-          <YAxis
-            label={{ value: "time [ms]", angle: -90, position: "insideLeft" }}
-          />
-          <Tooltip />
-          <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-          {Object.entries(measurements).map(([key, value], i) =>
-            value ? (
-              <Bar
-                type="monotone"
-                dataKey={key}
-                fill={colors[i]}
-                barSize={30}
-              />
-            ) : null
-          )}
-        </BarChart>
-
-        <label id="urlHelp" className="form-text text-center">
-          Graph for the given n versus c.
-        </label>
-        <BarChart width={900} height={300} data={dataN}>
-          <XAxis dataKey="c" stroke="#000" />
-          <YAxis
-            label={{ value: "time [ms]", angle: -90, position: "insideLeft" }}
-          />
-          <Tooltip />
-          <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-          {Object.entries(measurements).map(([key, value], i) =>
-            value ? (
-              <Bar
-                type="monotone"
-                dataKey={`results.${key}`}
-                fill={colors[i]}
-                barSize={30}
+            <label id="urlHelp" className="form-text text-center">
+              Graph for the given n and c versus time.
+            </label>
+            <BarChart width={900} height={300} data={dataNC.results}>
+              <XAxis
+                dataKey="creationDateTime"
+                stroke="#000"
+                tick={{ angle: 0, width: 50 }}
                 interval={0}
+                scaleToFit={true}
               />
-            ) : null
-          )}
-        </BarChart>
+              <YAxis
+                label={{
+                  value: "time [ms]",
+                  angle: -90,
+                  position: "insideLeft"
+                }}
+              />
+              <Tooltip />
+              <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
+              {Object.entries(measurements).map(([key, value], i) =>
+                value ? (
+                  <Bar
+                    type="monotone"
+                    dataKey={key}
+                    fill={colors[i]}
+                    barSize={30}
+                  />
+                ) : null
+              )}
+            </BarChart>
 
-        <div className="d-flex justify-content-center mb-3">
-          {Object.entries(measurements).map(([key, value]) => (
-            <div className="form-check form-check-inline">
-              <input
-                className="form-check-input"
-                type="checkbox"
-                id={key}
-                value={value}
-                onChange={e => this.changeMeasurement(key, e)}
-                checked={value}
+            <label id="urlHelp" className="form-text text-center">
+              Graph for the given n versus c.
+            </label>
+            <BarChart width={900} height={300} data={dataN}>
+              <XAxis dataKey="c" stroke="#000" />
+              <YAxis
+                label={{
+                  value: "time [ms]",
+                  angle: -90,
+                  position: "insideLeft"
+                }}
               />
-              <label className="form-check-label" htmlFor={key}>
-                {key}
-              </label>
+              <Tooltip />
+              <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
+              {Object.entries(measurements).map(([key, value], i) =>
+                value ? (
+                  <Bar
+                    type="monotone"
+                    dataKey={`results.${key}`}
+                    fill={colors[i]}
+                    barSize={30}
+                    interval={0}
+                  />
+                ) : null
+              )}
+            </BarChart>
+
+            <div className="d-flex justify-content-center mb-3">
+              {Object.entries(measurements).map(([key, value]) => (
+                <div className="form-check form-check-inline">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    id={key}
+                    value={value}
+                    onChange={e => this.changeMeasurement(key, e)}
+                    checked={value}
+                  />
+                  <label className="form-check-label" htmlFor={key}>
+                    {key}
+                  </label>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </div>
+        ) : (
+          <h4 className="text-center font-italic mt-3"> No data. </h4>
+        )}
         <button type="button" className="btn btn-success" onClick={this.back}>
           <MdKeyboardBackspace /> Back
         </button>
