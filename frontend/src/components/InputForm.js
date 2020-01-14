@@ -30,6 +30,8 @@ class InputForm extends Component {
     var yyyy = today.getFullYear();
     var hh = String(today.getHours() + 1);
 
+    console.log(hh);
+    if (hh.length === 1) hh = "0" + hh;
     var date = yyyy + "-" + mm + "-" + dd;
     var time = hh + ":00";
 
@@ -136,6 +138,9 @@ class InputForm extends Component {
 
           <div className="form-row align-items-center">
             <div className="col-auto w-50">
+              <small id="requests" className="form-text text-muted">
+                Number of requests.
+              </small>
               <div className="input-group mb-2">
                 <div className="input-group-prepend">
                   <div className="input-group-text">-n</div>
@@ -147,10 +152,14 @@ class InputForm extends Component {
                   min="1"
                   value={n}
                   onChange={e => this.onChangeValue("n", e)}
+                  id="requests"
                 />
               </div>
             </div>
             <div className="col-auto w-50">
+              <small id="parallelism" className="form-text text-muted">
+                Level of parallelism.
+              </small>
               <div className="input-group mb-2">
                 <div className="input-group-prepend">
                   <div className="input-group-text">-c</div>
@@ -162,6 +171,7 @@ class InputForm extends Component {
                   min="1"
                   value={c}
                   onChange={e => this.onChangeValue("c", e)}
+                  id="parallelism"
                 />
               </div>
             </div>
@@ -202,6 +212,9 @@ class InputForm extends Component {
             <div>
               <div className="form-row align-items-center mt-2 mb-2">
                 <div className="col-sm ">
+                  <small id="frequency" className="form-text text-muted">
+                    The number of repetitions (-1: infinity).
+                  </small>
                   <div className="input-group mb-2">
                     <div className="input-group-prepend">
                       <div className="input-group-text">
@@ -213,12 +226,16 @@ class InputForm extends Component {
                       className="form-control"
                       placeholder="Frequency"
                       min="1"
+                      id="frequency"
                       value={frequency}
                       onChange={e => this.setFrequency(e)}
                     />
                   </div>
                 </div>
                 <div className="col-sm">
+                  <small id="repetitions" className="form-text text-muted">
+                    How often perform task (in seconds).
+                  </small>
                   <div className="input-group mb-2">
                     <div className="input-group-prepend">
                       <div className="input-group-text">
@@ -232,6 +249,7 @@ class InputForm extends Component {
                       min="-1"
                       value={repetitions}
                       onChange={e => this.setRepetitions(e)}
+                      id="repetitions"
                     />
                   </div>
                 </div>
@@ -240,6 +258,9 @@ class InputForm extends Component {
               {startNow ? null : (
                 <div className="form-row align-items-center">
                   <div className="col-sm ">
+                    <small id="date" className="form-text text-muted">
+                      Date of first request.
+                    </small>
                     <div className="input-group mb-2">
                       <div className="input-group-prepend">
                         <div className="input-group-text">
@@ -252,10 +273,14 @@ class InputForm extends Component {
                         placeholder="Date"
                         value={date}
                         onChange={e => this.setDate(e, "date")}
+                        id="date"
                       />
                     </div>
                   </div>
                   <div className="col-sm ">
+                    <small id="time" className="form-text text-muted">
+                      Time of first request.
+                    </small>
                     <div className="input-group mb-2">
                       <div className="input-group-prepend">
                         <div className="input-group-text">
